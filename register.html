@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء حساب جديد</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>إنشاء حساب جديد</h2>
+
+        <form id="registerForm">
+
+            <label>الاسم الكامل</label>
+            <input type="text" id="fullName" placeholder="اكتب اسمك" required>
+
+            <label>رقم الهاتف</label>
+            <input type="text" id="phone" placeholder="010..." required>
+
+            <label>البريد الإلكتروني</label>
+            <input type="email" id="email" placeholder="example@gmail.com" required>
+
+            <label>كلمة المرور</label>
+            <input type="password" id="password" placeholder="******" required>
+
+            <button type="submit">إنشاء حساب</button>
+
+        </form>
+
+        <p>
+            لديك حساب بالفعل؟  
+            <a href="index.html">تسجيل الدخول</a>
+        </p>
+    </div>
+
+    <script>
+        const API = "https://sheetdb.io/api/v1/u0utqc3ngifxy";
+
+        document.getElementById("registerForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            // بيانات المستخدم
+            let user = {
+                FullName: document.getElementById("fullName").value,
+                Phone: document.getElementById("phone").value,
+                Email: document.getElementById("email").value,
+                Password: document.getElementById("password").value
+            };
+
+            // ١) التحقق من وجود الإيميل قبل التسجيل
+            let check = await fetch(`${API}/search?Email=${user.Email}`);
+            let exists = await check.json();
+
+            if (exists.length > 0) {
+                alert("هذا البريد مستخدم بالفعل ❗");
+                return;
+            }
+
+            // ٢) إرسال البيانات
+            let response = await fetch(API, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ data: user })
+            });
+
+            if (response.ok) {
+                alert("تم إنشاء الحساب بنجاح 🎉");
+                window.location.href = "index.html";
+            } else {
+                alert("حدث خطأ أثناء التسجيل ❌");
+            }
+        });
+    </script>
+
+</body>
+
+</html>
