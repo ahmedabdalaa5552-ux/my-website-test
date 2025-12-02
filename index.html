@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>موقعي - تسجيل</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><h1>شركة النجاح - التسجيل</h1></header>
+
+  <main class="container">
+    <section id="register">
+      <h2>تسجيل مستخدم جديد</h2>
+      <form id="regForm">
+        <label>الاسم الكامل<input type="text" id="name" required></label>
+        <label>الهويه<input type="text" id="nationalId" required></label>
+        <label>الهاتف<input type="tel" id="phone" required></label>
+        <label>البريد الإلكتروني<input type="email" id="email"></label>
+        <button type="submit">سجل الآن</button>
+      </form>
+      <div id="regMsg"></div>
+    </section>
+
+    <section id="login">
+      <h2>تسجيل دخول</h2>
+      <label>الهاتف<input id="loginPhone" type="tel"></label>
+      <button id="loginBtn">دخول</button>
+      <div id="loginMsg"></div>
+    </section>
+
+    <section id="visit">
+      <h2>لوحة التحكم (Admin)</h2>
+      <p>لوحة التحكم محفوظة في صفحة <a href="admin.html">admin.html</a> (محمية بكود).</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
