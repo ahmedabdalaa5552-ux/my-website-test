@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء حساب جديد</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>إنشاء حساب جديد</h2>
+
+        <form id="registerForm">
+
+            <label>الاسم الكامل</label>
+            <input type="text" id="fullName" placeholder="اكتب اسمك" required>
+
+            <label>رقم الهاتف</label>
+            <input type="text" id="phone" placeholder="010..." required>
+
+            <label>البريد الإلكتروني</label>
+            <input type="email" id="email" placeholder="example@gmail.com" required>
+
+            <label>كلمة المرور</label>
+            <input type="password" id="password" placeholder="******" required>
+
+            <button type="submit">إنشاء حساب</button>
+
+        </form>
+
+        <p>لديك حساب بالفعل؟  
+            <a href="index.html">تسجيل الدخول</a>
+        </p>
+
+    </div>
+
+    <!-- سكربت التسجيل يعمل 100% -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+            const form = document.getElementById("registerForm");
+            const API = "https://sheetdb.io/api/v1/u0utqc3ngifxy";
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+
+                let user = {
+                    fullName: document.getElementById("fullName").value,
+                    phone: document.getElementById("phone").value,
+                    email: document.getElementById("email").value,
+                    password: document.getElementById("password").value
+                };
+
+                // 1 — فحص إذا كان الإيميل موجود مسبقًا
+                let check = await fetch(`${API}/search?email=${user.email}`);
+                let exists = await check.json();
+
+                if (exists.length > 0) {
+                    alert("❌ هذا الإيميل مستخدم مسبقًا!");
+                    return;
+                }
+
+                // 2 — إرسال البيانات
+                let response = await fetch(API, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ data: [user] })
+                });
+
+                if (response.ok) {
+                    alert("✔ تم إنشاء الحساب بنجاح!");
+                    window.location.href = "index.html";
+                } else {
+                    alert("❌ حدث خطأ أثناء التسجيل!");
+                }
+            });
+
+        });
+    </script>
+
+</body>
+</html>
