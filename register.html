@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <form id="registerForm">
+    <h2>التسجيل</h2>
+
+    <input type="text" id="name" placeholder="الاسم الكامل" required>
+    <input type="text" id="phone" placeholder="رقم الهاتف" required>
+    <input type="email" id="email" placeholder="البريد" required>
+    <input type="password" id="pass" placeholder="كلمة السر" required>
+
+    <button type="submit">تسجيل</button>
+  </form>
+
+  <script>
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const API_URL = "https://sheetdb.io/api/v1/ecxq5ppvzjdx7";
+
+      const formData = {
+        fullName: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        email: document.getElementById("email").value,
+        password: document.getElementById("pass").value,
+      };
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: [formData] })
+      });
+
+      alert("تم التسجيل بنجاح ✔️");
+    });
+  </script>
+
+</body>
+</html>
