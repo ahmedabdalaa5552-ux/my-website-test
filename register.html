@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تسجيل مستخدم جديد</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>تسجيل مستخدم جديد</h2>
+    <form id="registerForm">
+      <label>الاسم الكامل</label>
+      <input type="text" id="fullName" required>
+      <label>رقم الهاتف</label>
+      <input type="text" id="phone" required>
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="email" required>
+      <label>كلمة المرور</label>
+      <input type="password" id="password" required>
+      <button type="submit">إنشاء حساب</button>
+    </form>
+  </div>
+
+  <script>
+    const API = "https://sheetdb.io/api/v1/ecxq5ppvzjdx7";
+
+    document.getElementById("registerForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const user = {
+        fullName: document.getElementById("fullName").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        password: document.getElementById("password").value.trim()
+      };
+
+      try {
+        const res = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data: [user] })
+        });
+        if (res.ok) {
+          alert("✔️ تم إنشاء الحساب بنجاح!");
+          window.location.href = "index.html";
+        } else {
+          alert("❌ فشل في التسجيل");
+        }
+      } catch (err) {
+        alert("❌ خطأ في الاتصال");
+      }
+    });
+  </script>
+</body>
+</html>
