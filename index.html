@@ -1,31 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>منصة الوساطة العقارية</title><link rel="stylesheet" href="styles.css"></head>
 <body>
+  <header class="site-header"><div class="site-brand"><img src="/logo.png" alt="logo" style="height:40px;margin-left:8px;"><span id="siteName">موقع العقارات</span></div></header>
+  <main class="container"><h1>قائمة العقارات</h1><div id="properties"></div></main>
+  <div id="floatingBar"></div>
+  <script src="/js/header_integration.js"></script>
+  <script src="/js/floating.js"></script>
+  <script>
+    
+async function load(){
+  const res = await fetch('/api/properties');
+  const data = await res.json();
+  const out = (Array.isArray(data) ? data : []).map(p => {
+    const mediaHtml = p.image ? `<img class="prop-image" src="${p.image}" alt="صورة العقار">`
+                    : (p.video ? `<video class="prop-video" controls src="${p.video}"></video>` : '');
+    return `<div class="card">
+      <h3>${p.title || 'بدون عنوان'}</h3>
+      <div class="small">السعر: ${p.price || 'غير محدد'}</div>
+      <div class="small">المنطقة: ${p.location || ''} - ${p.neighborhood || ''}</div>
+      ${mediaHtml}
+      <div class="prop-desc">${p.description || ''}</div>
+      <div class="actions"><button class="button" onclick="contact('${p._id}')">تواصل للشراء</button></div>
+    </div>`;
+  }).join('\n');
+  document.getElementById('properties').innerHTML = out || '<div class="card">لا توجد عقارات حتى الآن.</div>';
+}
 
-<div class="container">
-    <h2>تسجيل الدخول</h2>
-
-    <form id="loginForm">
-        <label>البريد الإلكتروني</label>
-        <input type="email" id="email" required>
-
-        <label>كلمة المرور</label>
-        <input type="password" id="password" required>
-
-        <button type="submit">دخول</button>
-    </form>
-
-    <p>ليس لديك حساب؟  
-        <a href="register.html">إنشاء حساب</a>
-    </p>
-</div>
-
-<script src="script.js"></script>
-</body>
-</html>
+function contact(id){ const token = localStorage.getItem('token'); if(!token) { location.href='register.html?propertyId='+id; return; } fetch('/api/chat/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({propertyId:id})}).then(r=>r.json()).then(d=>{ if(d.room) location.href='chat.html?roomId='+d.room._id; }); }

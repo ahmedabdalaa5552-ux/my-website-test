@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>لوحة تحكم الادمن</title>
+<link rel="stylesheet" href="styles.css"/></head>
+<body>
+<div class="container">
+  <h2>لوحة تحكم الإدارة</h2>
+  <div>
+    <input id="adminCode" placeholder="أدخل كود الإدارة">
+    <button onclick="auth()">دخول</button>
+  </div>
+  <div id="adminArea" style="display:none;margin-top:12px">
+    <h3>إعدادات الموقع</h3>
+    <div>
+      <label>اسم الموقع</label><input id="siteName" /><label>رقم واتساب</label><input id="wa" />
+      <button onclick="saveSettings()" class="button">حفظ الإعدادات</button>
+    </div>
+    <h3>العقارات</h3>
+    <div id="propsList"></div>
+    <h3>المستخدمون</h3>
+    <div id="usersList"></div>
+  </div>
+</div>
+<script>
+const ADMIN_CODE = "55555";
+function auth(){
+  const code = document.getElementById('adminCode').value.trim();
+  if(code !== ADMIN_CODE){ alert('كود خاطئ'); return; }
+  document.getElementById('adminArea').style.display='block';
+  document.getElementById('adminCode').style.display='none';
+  loadData();
+}
+async function loadData(){
+  // load settings
+  try{
+    const s = await (await fetch('/api/settings')).json();
+    document.getElementById('siteName').value = s.siteName || '';
+    document.getElementById('wa').value = s.whatsappNumber || '';
+  }catch(e){}
+  // load properties
+  const props = await (await fetch('/api/properties')).json();
+  document.getElementById('propsList').innerHTML = (Array.isArray(props)?props:[]).map(p=>`
+    <div class="card"><b>${p.title||'بدون عنوان'}</b><div class="small">${p.price||''}</div>
+    <div>${p.description||''}</div>
+    <div class="actions">
+      <button onclick="approve('${p._id}')">اعتماد</button>
+      <button onclick="del('${p._id}')">حذف</button>
+    </div></div>
+  `).join('');
+  // load users
+  const users = await (await fetch('/api/users')).json();
+  document.getElementById('usersList').innerHTML = (Array.isArray(users)?users:[]).map(u=>`
+    <div class="card"><b>${u.name||u.fullName||'مستخدم'}</b><div class="small">${u.phone||''} - ${u.email||''}</div>
+    <div class="actions"><button onclick="deleteUser('${u._id}')">حذف</button></div></div>
+  `).join('');
+}
+async function approve(id){
+  if(!confirm('اعتماد هذا العقار؟')) return;
+  await fetch('/api/admin/properties/'+id+'/approve',{method:'POST'});
+  loadData();
+}
+async function del(id){
+  if(!confirm('حذف هذا العنصر؟')) return;
+  await fetch('/api/admin/properties/'+id+'/delete',{method:'POST'});
+  loadData();
+}
+async function deleteUser(id){
+  if(!confirm('حذف المستخدم؟')) return;
+  await fetch('/api/admin/users/'+id+'/delete',{method:'POST'});
+  loadData();
+}
+async function saveSettings(){
+  const s = { siteName: document.getElementById('siteName').value, whatsappNumber: document.getElementById('wa').value };
+  await fetch('/api/admin/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(s)});
+  alert('تم الحفظ');
+}
+</script>
+</body>
+</html>

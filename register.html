@@ -1,64 +1,33 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إنشاء حساب جديد</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<div class="container">
-    <h2>إنشاء حساب جديد</h2>
-
-    <form id="registerForm">
-        <label>الاسم الكامل</label>
-        <input type="text" id="fullName" required>
-
-        <label>رقم الهاتف</label>
-        <input type="text" id="phone" required>
-
-        <label>البريد الإلكتروني</label>
-        <input type="email" id="email" required>
-
-        <label>كلمة المرور</label>
-        <input type="password" id="password" required>
-
-        <button type="submit">إنشاء حساب</button>
-    </form>
-
-    <p>لديك حساب؟  
-        <a href="index.html">تسجيل الدخول</a>
-    </p>
-</div>
-
+<!doctype html><html lang="ar"><head><meta charset="utf-8"/><meta name='viewport' content='width=device-width,initial-scale=1'/><title>تسجيل</title></head><body>
+<h2>تسجيل جديد</h2>
+<form id="regForm" enctype="multipart/form-data">
+  <input name="name" id="name" placeholder="الاسم" required><br/>
+  <input name="phone" id="phone" placeholder="رقم الجوال" required><br/>
+  <input name="email" id="email" placeholder="البريد الإلكتروني" required><br/>
+  <input name="phoneLand" id="phoneLand" placeholder="الهاتف الأرضي (اختياري)"><br/>
+  <input name="password" id="password" type="password" placeholder="كلمة المرور" required><br/>
+  <input name="confirm" id="confirm" type="password" placeholder="تأكيد كلمة المرور" required><br/>
+  <div id="identityBlock">
+    <label>رفع صورة الهوية</label>
+    <input type="file" id="identityImage" name="identityImage" accept="image/*"><br/>
+  </div>
+  <button type="submit">تسجيل</button>
+</form>
 <script>
-const API = "https://sheetdb.io/api/v1/ecxq5ppvzjdx7";
-
-document.getElementById("registerForm").addEventListener("submit", async (e) => {
+  async function init(){ const s = await (await fetch('/api/settings')).json(); if(s.identityVerification==='off'){ document.getElementById('identityBlock').style.display='none'; } }
+  init();
+  document.getElementById('regForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
-
-    let user = {
-        fullName: document.getElementById("fullName").value,
-        phone: document.getElementById("phone").value,
-        email: document.getElementById("email").value,
-        password: document.getElementById("password").value
-    };
-
-    let res = await fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ data: [user] })
-    });
-
-    if (res.ok) {
-        alert("تم إنشاء الحساب بنجاح!");
-        window.location.href = "index.html";
-    } else {
-        alert("خطأ أثناء التسجيل");
-    }
-});
+    const f = e.target;
+    if(f.password.value !== f.confirm.value) return alert('كلمات السر غير متطابقة');
+    const fd = new FormData();
+    fd.append('name', f.name.value); fd.append('phone', f.phone.value); fd.append('email', f.email.value); fd.append('phoneLand', f.phoneLand.value); fd.append('password', f.password.value);
+    const params = new URLSearchParams(location.search); if(params.get('propertyId')) fd.append('propertyId', params.get('propertyId'));
+    if(document.getElementById('identityBlock').style.display !== 'none' && document.getElementById('identityImage').files[0]) fd.append('identityImage', document.getElementById('identityImage').files[0]);
+    const res = await fetch('/api/auth/register', { method:'POST', body: fd });
+    const data = await res.json();
+    if(!res.ok) return alert(data.message||'خطأ في التسجيل');
+    localStorage.setItem('token', data.token); location.href = params.get('propertyId') ? 'chat.html?roomId='+data.chatRedirect?.roomId : 'index.html';
+  });
 </script>
-
-</body>
-</html>
+</body></html>
